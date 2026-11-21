@@ -1,0 +1,385 @@
+use("plataforma_streaming");
+
+const generos = ["Ciencia Ficción", "Drama", "Comedia", "Suspenso", "Documental"];
+const plataformas = ["Claro Video", "Netflix", "Disney+", "Prime Video"];
+
+const peliculas = [];
+for (let i = 1; i <= 115; i++) {
+  peliculas.push({
+    _id: "PEL-" + String(i).padStart(3, "0"),
+    titulo: `Película Estreno ${i}`,
+    genero: generos[i % generos.length],
+    anio: 2015 + (i % 12),
+    duracion_min: 85 + (i % 65),
+    plataforma: plataformas[i % plataformas.length],
+    disponible: i % 12 !== 0
+  });
+}
+db.peliculas.insertMany(peliculas);
+
+const resenas = [];
+for (let j = 1; j <= 115; j++) {
+  const numPel = (j % 115) + 1;
+  resenas.push({
+    _id: "RES-" + String(j).padStart(3, "0"),
+    pelicula_id: "PEL-" + String(numPel).padStart(3, "0"),
+    usuario: `espectador_${j}`,
+    puntuacion: (j % 5) + 1,
+    minutos_vistos: 40 + (j % 80),
+    recomendada: ((j % 5) + 1) >= 4
+  });
+}
+db.resenas.insertMany(resenas);
+{
+    '89': 'RES-090',
+    '90': 'RES-091',
+    '91': 'RES-092',
+    '92': 'RES-093',
+    '93': 'RES-094',
+    '94': 'RES-095',
+    '95': 'RES-096',
+    '96': 'RES-097',
+    '97': 'RES-098',
+    '98': 'RES-099',
+    '99': 'RES-100',
+    '100': 'RES-101',
+    '101': 'RES-102',
+    '102': 'RES-103',
+    '103': 'RES-104',
+    '104': 'RES-105',
+    '105': 'RES-106',
+    '106': 'RES-107',
+    '107': 'RES-108',
+    '108': 'RES-109',
+    '109': 'RES-110',
+    '110': 'RES-111',
+    '111': 'RES-112',
+    '112': 'RES-113',
+    '113': 'RES-114',
+    '114': 'RES-115'
+  }
+}
+db.peliculas.insertOne({
+  _id: "PEL-900",
+  titulo: "Horizonte Final",
+  genero: "Ciencia Ficción",
+  anio: 2026,
+  duracion_min: 132,
+  plataforma: "Claro Video",
+  disponible: true
+})
+{
+  acknowledged: true,
+  insertedId: 'PEL-900'
+}
+db.peliculas.find({ genero: "Suspenso", disponible: true }).limit(5)
+{
+  _id: 'PEL-003',
+  titulo: 'Película Estreno 3',
+  genero: 'Suspenso',
+  anio: 2018,
+  duracion_min: 88,
+  plataforma: 'Prime Video',
+  disponible: true
+}
+{
+  _id: 'PEL-008',
+  titulo: 'Película Estreno 8',
+  genero: 'Suspenso',
+  anio: 2023,
+  duracion_min: 93,
+  plataforma: 'Claro Video',
+  disponible: true
+}
+{
+  _id: 'PEL-013',
+  titulo: 'Película Estreno 13',
+  genero: 'Suspenso',
+  anio: 2016,
+  duracion_min: 98,
+  plataforma: 'Netflix',
+  disponible: true
+}
+{
+  _id: 'PEL-018',
+  titulo: 'Película Estreno 18',
+  genero: 'Suspenso',
+  anio: 2021,
+  duracion_min: 103,
+  plataforma: 'Disney+',
+  disponible: true
+}
+{
+  _id: 'PEL-023',
+  titulo: 'Película Estreno 23',
+  genero: 'Suspenso',
+  anio: 2026,
+  duracion_min: 108,
+  plataforma: 'Prime Video',
+  disponible: true
+}
+db.peliculas.updateOne(
+  { _id: "PEL-900" },
+  { $set: { duracion_min: 138, plataforma: "Netflix" } }
+)
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+db.peliculas.deleteOne({ _id: "PEL-900" })
+{
+  acknowledged: true,
+  deletedCount: 1
+}
+db.resenas.aggregate([
+  { $match: { recomendada: true, puntuacion: { $gte: 4 } } },
+  {
+    $lookup: {
+      from: "peliculas",
+      localField: "pelicula_id",
+      foreignField: "_id",
+      as: "info_pelicula"
+    }
+  },
+  { $unwind: "$info_pelicula" },
+  {
+    $project: {
+      _id: 1,
+      usuario: 1,
+      puntuacion: 1,
+      titulo_pelicula: "$info_pelicula.titulo",
+      genero: "$info_pelicula.genero",
+      plataforma: "$info_pelicula.plataforma"
+    }
+  }
+])
+{
+  _id: 'RES-003',
+  usuario: 'espectador_3',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 4',
+  genero: 'Documental',
+  plataforma: 'Claro Video'
+}
+{
+  _id: 'RES-004',
+  usuario: 'espectador_4',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 5',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Netflix'
+}
+{
+  _id: 'RES-008',
+  usuario: 'espectador_8',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 9',
+  genero: 'Documental',
+  plataforma: 'Netflix'
+}
+{
+  _id: 'RES-009',
+  usuario: 'espectador_9',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 10',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Disney+'
+}
+{
+  _id: 'RES-013',
+  usuario: 'espectador_13',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 14',
+  genero: 'Documental',
+  plataforma: 'Disney+'
+}
+{
+  _id: 'RES-014',
+  usuario: 'espectador_14',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 15',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Prime Video'
+}
+{
+  _id: 'RES-018',
+  usuario: 'espectador_18',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 19',
+  genero: 'Documental',
+  plataforma: 'Prime Video'
+}
+{
+  _id: 'RES-019',
+  usuario: 'espectador_19',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 20',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Claro Video'
+}
+{
+  _id: 'RES-023',
+  usuario: 'espectador_23',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 24',
+  genero: 'Documental',
+  plataforma: 'Claro Video'
+}
+{
+  _id: 'RES-024',
+  usuario: 'espectador_24',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 25',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Netflix'
+}
+{
+  _id: 'RES-028',
+  usuario: 'espectador_28',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 29',
+  genero: 'Documental',
+  plataforma: 'Netflix'
+}
+{
+  _id: 'RES-029',
+  usuario: 'espectador_29',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 30',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Disney+'
+}
+{
+  _id: 'RES-033',
+  usuario: 'espectador_33',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 34',
+  genero: 'Documental',
+  plataforma: 'Disney+'
+}
+{
+  _id: 'RES-034',
+  usuario: 'espectador_34',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 35',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Prime Video'
+}
+{
+  _id: 'RES-038',
+  usuario: 'espectador_38',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 39',
+  genero: 'Documental',
+  plataforma: 'Prime Video'
+}
+{
+  _id: 'RES-039',
+  usuario: 'espectador_39',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 40',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Claro Video'
+}
+{
+  _id: 'RES-043',
+  usuario: 'espectador_43',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 44',
+  genero: 'Documental',
+  plataforma: 'Claro Video'
+}
+{
+  _id: 'RES-044',
+  usuario: 'espectador_44',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 45',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Netflix'
+}
+{
+  _id: 'RES-048',
+  usuario: 'espectador_48',
+  puntuacion: 4,
+  titulo_pelicula: 'Película Estreno 49',
+  genero: 'Documental',
+  plataforma: 'Netflix'
+}
+{
+  _id: 'RES-049',
+  usuario: 'espectador_49',
+  puntuacion: 5,
+  titulo_pelicula: 'Película Estreno 50',
+  genero: 'Ciencia Ficción',
+  plataforma: 'Disney+'
+}
+Type "it" for more
+db.peliculas.aggregate([
+  {
+    $group: {
+      _id: "$genero",
+      cantidad_titulos: { $sum: 1 },
+      duracion_promedio: { $avg: "$duracion_min" },
+      minutos_totales: { $sum: "$duracion_min" }
+    }
+  },
+  { $sort: { cantidad_titulos: -1 } }
+])
+{
+  _id: 'Documental',
+  cantidad_titulos: 23,
+  duracion_promedio: 115.73913043478261,
+  minutos_totales: 2662
+}
+{
+  _id: 'Comedia',
+  cantidad_titulos: 23,
+  duracion_promedio: 113.73913043478261,
+  minutos_totales: 2616
+}
+{
+  _id: 'Drama',
+  cantidad_titulos: 23,
+  duracion_promedio: 112.73913043478261,
+  minutos_totales: 2593
+}
+{
+  _id: 'Suspenso',
+  cantidad_titulos: 23,
+  duracion_promedio: 114.73913043478261,
+  minutos_totales: 2639
+}
+{
+  _id: 'Ciencia Ficción',
+  cantidad_titulos: 23,
+  duracion_promedio: 113.91304347826087,
+  minutos_totales: 2620
+}
+db.resenas.aggregate([
+  {
+    $group: {
+      _id: "$recomendada",
+      total_resenas: { $sum: 1 },
+      calificacion_media: { $avg: "$puntuacion" },
+      suma_minutos_vistos: { $sum: "$minutos_vistos" }
+    }
+  }
+])
+{
+  _id: false,
+  total_resenas: 69,
+  calificacion_media: 2,
+  suma_minutos_vistos: 4979
+}
+{
+  _id: true,
+  total_resenas: 46,
+  calificacion_media: 4.5,
+  suma_minutos_vistos: 3411
+}
+plataforma_streaming
+
+
